@@ -1,8 +1,9 @@
-streamlit 
-pandas 
-numpy 
-plotly 
-pyarrow 
-scikit-learn 
-openpyxl 
+streamlit
+pandas
+numpy
+plotly
+pyarrow
+scikit-learn
+requests
+openpyxl
 fastparquet

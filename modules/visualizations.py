@@ -30,8 +30,7 @@ def grafico_precio_producto(df):
 
 
 def grafico_radar(valores, producto):
-    if valores is None or len(valores) == 0:
-        return None
+    
     """
     📌 NEGOCIO:
     Visualiza perfil estratégico del producto
@@ -39,6 +38,9 @@ def grafico_radar(valores, producto):
     🆕 MEJORA:
     - Mejora de legibilidad en radar
     """
+
+    if valores is None or len(valores) == 0:
+        return None
 
     fig = go.Figure()
 

@@ -18,12 +18,16 @@ env/
 .ipynb_checkpoints/
 
 # =================================================
-# DATASETS Y ARCHIVOS PESADOS
+# DATASETS CRUDOS PESADOS
 # =================================================
-
+data/raw/
 data/*.csv
 data/*.xlsx
 data/*.json
+
+# ⚠️ IMPORTANTE:
+# NO ignorar parquet procesado
+!data/*.parquet
 
 # =================================================
 # STREAMLIT
@@ -54,10 +58,7 @@ Thumbs.db
 .pytest_cache/
 
 # =================================================
-# NOTEBOOKS EXPORTADOS
+# TEMPORALES
 # =================================================
-notebooks/*.html
-notebooks/*.pdf
-
 *.tmp
 *.bak

@@ -137,7 +137,7 @@ tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 # ── TAB 0 ───────────────────────
 with tab0:
-    st.code(arquitectura)
+    st.text(arquitectura)
 
 # ── TAB 1 ───────────────────────
 with tab1:
