@@ -5,7 +5,7 @@ import numpy as np
 import requests
 
 # ── BASE DEL PROYECTO ──────────────────────────
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 # ── PARQUET ────────────────────────────────────
 DATA_PATH = BASE_DIR / "data" / "dataset_final_glp.parquet"

@@ -1,259 +1,501 @@
 arquitectura = """
-🧠 ARQUITECTURA FINAL v2 — Dashboard Analítico GLP Perú (Nivel Profesional)
-==========================================================================
+🧠 ARQUITECTURA FINAL v3 — Plataforma Analítica GLP Perú
+============================================================================
 
-📌 ENFOQUE:
+📌 ENFOQUE GENERAL
+------------------
+
 Arquitectura modular orientada a:
-- Escalabilidad
-- Reutilización
-- Separación clara de responsabilidades (Clean Architecture Light)
 
-==========================================================================
+✔ Escalabilidad
+✔ Reutilización
+✔ Separación de responsabilidades
+✔ Compatibilidad LOCAL + WEB
+✔ Integración ETL + Dashboard
+✔ Preparada para analítica empresarial ligera
 
-📁 ESTRUCTURA DEL PROYECTO
--------------------------
+La solución integra:
 
-app.py                         → Orquestador principal (UI + flujo)
+1. Pipeline ETL automatizado
+2. API REST simulada con Flask
+3. Dataset analítico optimizado
+4. Dashboard interactivo en Streamlit
+5. Arquitectura híbrida resiliente
+
+============================================================================
+📁 ESTRUCTURA REAL DEL PROYECTO
+----------------------------------------------------------------------------
+
+PROYECTO_GLP/
+│
+├── app.py
+│   → Aplicación principal Streamlit
+│   → Orquestador general del dashboard
+│
+├── requirements.txt
+│   → Dependencias del proyecto
+│
+├── README.md
+│   → Documentación general
+│
+├── .gitignore
+│   → Exclusión de archivos temporales y pesados
 │
 ├── 📂 data/
 │   └── dataset_final_glp.parquet
+│       → Dataset final procesado y optimizado
 │
 ├── 📂 modules/
-│   ├── data_loader.py        → Carga + feature engineering
-│   ├── filters.py            → Filtros del usuario
-│   ├── metrics.py            → KPIs
-│   ├── visualizations.py     → Gráficos
-│   ├── business_logic.py     → Score + reglas
-│   └── utils.py              → Funciones auxiliares
+│   ├── data_loader.py
+│   │   → Carga híbrida API/parquet
+│   │
+│   ├── filters.py
+│   │   → Aplicación de filtros dinámicos
+│   │
+│   ├── metrics.py
+│   │   → KPIs ejecutivos
+│   │
+│   ├── visualizations.py
+│   │   → Gráficos y visualizaciones
+│   │
+│   ├── business_logic.py
+│   │   → Score estratégico y recomendaciones
+│   │
+│   ├── utils.py
+│   │   → Funciones auxiliares
+│   │
+│   └── arquitectura.py
+│       → Documentación de arquitectura
 │
-├── 📂 config/
-│   └── settings.py           → Configuración global (opcional futuro)
+├── 📂 notebooks/
+│   ├── etl_pipeline.ipynb
+│   │   → Pipeline ETL completo
+│   │
+│   ├── servidor_api.py
+│   │   → API REST local simulada (Flask)
+│   │
+│   ├── *.xlsx
+│   │   → Archivos Excel auxiliares
+│   │
+│   └── otros notebooks de análisis
 │
-└── 📂 assets/
-    └── estilos / imágenes (futuro)
+└── (Futuro)
+    ├── config/
+    └── assets/
 
-==========================================================================
-
+============================================================================
 🔁 FLUJO GENERAL DEL SISTEMA
----------------------------
+----------------------------------------------------------------------------
 
-1. CONFIGURACIÓN
-   └── st.set_page_config()
-       ✔ Layout wide
-       ✔ Optimización UX
+                 ┌───────────────────────┐
+                 │ API REST (Flask)      │
+                 │ servidor_api.py       │
+                 └──────────┬────────────┘
+                            │
+                            ▼
+                 ┌───────────────────────┐
+                 │ Pipeline ETL          │
+                 │ notebooks/*.ipynb     │
+                 └──────────┬────────────┘
+                            │
+                            ▼
+                 ┌───────────────────────┐
+                 │ Dataset Parquet       │
+                 │ data/                 │
+                 └──────────┬────────────┘
+                            │
+                            ▼
+                 ┌───────────────────────┐
+                 │ Dashboard Streamlit   │
+                 │ app.py                │
+                 └───────────────────────┘
 
-2. CARGA DE DATOS (data_loader.py)
-   └── cargar_datos()
+============================================================================
+⚙️ CAPA 1 — API REST LOCAL (FLASK)
+----------------------------------------------------------------------------
 
-       ✔ Lectura desde parquet
-       ✔ Cache con @st.cache_data
-       ✔ Feature Engineering:
-           - precio_log (log-transform)
+Archivo:
+→ notebooks/servidor_api.py
 
-       📌 NEGOCIO:
-       Mejora análisis de precios extremos
+📌 FUNCIÓN:
+Simular una API REST para pruebas ETL y consumo de datos.
 
-3. VALIDACIÓN DE DATOS
-   ├── Validación de DataFrame vacío
-   ├── Validación de columnas críticas
-   └── Conversión de tipos (to_numeric)
+📌 ENDPOINTS:
+✔ /api/v1/precios-glp
+✔ /health
 
-       📌 NEGOCIO:
-       Evita decisiones sobre datos corruptos
+📌 TECNOLOGÍAS:
+- Flask
+- JSON
+- Requests
 
-4. LIMPIEZA DE DATOS
-   └── dropna columnas clave
+📌 BENEFICIO:
+Permite desacoplar la fuente de datos del dashboard.
 
-       📌 NEGOCIO:
-       Garantiza calidad mínima del análisis
+============================================================================
+📥 CAPA 2 — PIPELINE ETL AUTOMATIZADO
+----------------------------------------------------------------------------
 
-==========================================================================
+Ubicación:
+→ notebooks/etl_pipeline.ipynb
 
-🎛️ CAPA DE INTERACCIÓN (SIDEBAR)
---------------------------------
+============================================================================
+2.1 EXTRACT — INGESTA
+----------------------------------------------------------------------------
 
-Módulo: filters.py
+✔ Consumo automático desde API REST
+✔ Validación de conexión
+✔ Inicio automático de servidor Flask
+✔ Obtención de datos JSON
 
-Filtros disponibles:
-- Región
-- Producto (Top 10 dinámico)
-- Rango de precio
-- Slider de precio
-
-📌 UX:
-- Valores por defecto = TODO seleccionado
-- Evita dashboards vacíos
+LIBRERÍAS:
+- requests
+- subprocess
+- socket
 
 📌 NEGOCIO:
-Permite segmentación estratégica:
-- Geográfica
-- Comercial
-- Competitiva
+Automatiza la captura de información energética.
 
-==========================================================================
+============================================================================
+2.2 AUDITORÍA DE CALIDAD
+----------------------------------------------------------------------------
 
-🔍 MOTOR DE FILTRADO
--------------------
+Métricas implementadas:
 
-Función: aplicar_filtros()
+✔ Completitud
+✔ Unicidad
+✔ Validez
+✔ Consistencia
+✔ Actualidad
 
-✔ Boolean indexing optimizado
-✔ Compatible con grandes volúmenes
+📌 OBJETIVO:
+Detectar corrupción y problemas en el dataset.
+
+📌 RESULTADO:
+Datos confiables para análisis estratégico.
+
+============================================================================
+2.3 LIMPIEZA E IMPUTACIÓN
+----------------------------------------------------------------------------
+
+PROCESOS:
+
+✔ Imputación estadística (mediana)
+✔ Manejo de valores nulos
+✔ Limpieza de marcas vacías
+✔ Conversión robusta de tipos
+✔ Validación de reglas de negocio
+
+TECNOLOGÍAS:
+- Pandas
+- NumPy
+- Scikit-Learn
 
 📌 NEGOCIO:
-Dataset dinámico en tiempo real
+Garantiza calidad mínima para análisis.
 
-==========================================================================
+============================================================================
+2.4 DETECCIÓN DE OUTLIERS
+----------------------------------------------------------------------------
 
-📊 CAPA DE KPIs (metrics.py)
-----------------------------
+✔ Método IQR
+✔ Detección de precios extremos
+✔ Validación de anomalías
 
-Función: calcular_kpis()
+📌 NEGOCIO:
+Permite identificar posibles sobreprecios.
+
+============================================================================
+2.5 FEATURE ENGINEERING
+----------------------------------------------------------------------------
+
+Variables generadas:
+
+✔ precio_log
+✔ precio_norm
+✔ rango_precio
+✔ trimestre
+✔ indice_demanda
+✔ año
+✔ mes
+
+📌 NEGOCIO:
+Mejora el análisis estratégico y predictivo.
+
+============================================================================
+2.6 INTEGRACIÓN DE FUENTES
+----------------------------------------------------------------------------
+
+✔ Cruce con dataset maestro
+✔ Generación de regiones
+✔ Índice de demanda sintético
+
+📌 RESULTADO:
+Dataset enriquecido para inteligencia de negocio.
+
+============================================================================
+2.7 LOAD — ALMACENAMIENTO
+----------------------------------------------------------------------------
+
+FORMATO:
+✔ Apache Parquet
+
+COMPRESIÓN:
+✔ Snappy
+
+OPTIMIZACIONES:
+✔ Downcasting
+✔ Reducción de memoria RAM
+✔ Almacenamiento columnar
+
+RUTA:
+→ data/dataset_final_glp.parquet
+
+📌 BENEFICIO:
+Mayor velocidad de lectura en Streamlit.
+
+============================================================================
+📂 CAPA 3 — CARGA DE DATOS (data_loader.py)
+----------------------------------------------------------------------------
+
+FUNCIÓN PRINCIPAL:
+→ cargar_datos()
+
+============================================================================
+🔄 ARQUITECTURA HÍBRIDA
+----------------------------------------------------------------------------
+
+El sistema implementa carga dual:
+
+1. LOCAL
+   → Consumo API Flask
+
+2. WEB / STREAMLIT CLOUD
+   → Fallback automático a parquet
+
+============================================================================
+FLUJO DE CARGA
+----------------------------------------------------------------------------
+
+1. Intento conexión API local
+2. Si falla:
+      → lectura parquet
+3. Aplicación de feature engineering
+4. Cache de datos
+
+============================================================================
+TECNOLOGÍAS
+----------------------------------------------------------------------------
+
+✔ requests
+✔ pandas
+✔ pathlib
+✔ numpy
+✔ st.cache_data
+
+============================================================================
+📌 BENEFICIOS
+----------------------------------------------------------------------------
+
+✔ Compatible con desarrollo local
+✔ Compatible con despliegue web
+✔ Alta resiliencia
+✔ Evita dependencia obligatoria de Flask
+
+============================================================================
+🎛️ CAPA 4 — FILTROS DINÁMICOS
+----------------------------------------------------------------------------
+
+Archivo:
+→ filters.py
+
+FUNCIÓN:
+→ aplicar_filtros()
+
+FILTROS:
+
+✔ Región
+✔ Producto
+✔ Rango de precio
+✔ Slider de precio
+
+TÉCNICA:
+✔ Boolean Indexing
+
+📌 NEGOCIO:
+Segmentación dinámica del mercado.
+
+============================================================================
+📊 CAPA 5 — KPIs EJECUTIVOS
+----------------------------------------------------------------------------
+
+Archivo:
+→ metrics.py
+
+FUNCIÓN:
+→ calcular_kpis()
 
 KPIs:
-- Registros
-- Precio promedio
-- Máximo
-- Mínimo
 
-✔ Protección contra dataset vacío
-
-📌 NEGOCIO:
-Vista ejecutiva inmediata del mercado
-
-==========================================================================
-
-📈 CAPA DE VISUALIZACIÓN (visualizations.py)
--------------------------------------------
-
-1. 📊 Precio por producto (Bar Chart)
-   ✔ Ordenado
-   ✔ Etiquetas visibles
-
-2. 🥧 Distribución por rango (Pie)
-   ✔ Segmentación clara
-
-3. 📍 Precio por región (Bar)
-   ✔ Comparación geográfica
-
-4. 📊 Scatter avanzado (Tab 3)
-   ✔ Relación Precio vs Demanda
-   ✔ Reducción de ruido:
-       - Top N productos
-       - "Otros"
-   ✔ Hover enriquecido
-
-   📌 NEGOCIO:
-   Detecta:
-   - Oportunidades
-   - Sobreprecios
-   - Nichos
-
-5. 📈 Tendencia temporal
-   ✔ Uso de datetime real
-   ✔ Orden cronológico correcto
-
-   📌 NEGOCIO:
-   Detecta evolución de precios
-
-6. 📦 Boxplot
-   ✔ Dispersión por marca
-
-   📌 NEGOCIO:
-   Evalúa estabilidad de precios
-
-7. 🕸️ Radar Chart
-   ✔ Perfil estratégico del producto
-
-==========================================================================
-
-🧠 CAPA DE LÓGICA DE NEGOCIO (business_logic.py)
-------------------------------------------------
-
-Funciones:
-
-1. normalizar()
-   ✔ Escala métricas 0–1
-
-2. calcular_score()
-   ✔ Modelo ponderado:
-       - Precio
-       - Demanda
-       - Estabilidad
-       - Frecuencia
-       - Ranking
-
-3. clasificar()
-   ✔ Segmentación:
-       - ALTO
-       - MEDIO
-       - BAJO
-
-4. recomendacion()
-   ✔ Genera insights automáticos
+✔ Registros
+✔ Precio promedio
+✔ Precio máximo
+✔ Precio mínimo
 
 📌 NEGOCIO:
-Convierte datos → decisiones accionables
+Vista ejecutiva inmediata.
 
-==========================================================================
+============================================================================
+📈 CAPA 6 — VISUALIZACIONES
+----------------------------------------------------------------------------
 
-🔎 CAPA DE EXPLORACIÓN (TAB 5)
------------------------------
+Archivo:
+→ visualizations.py
 
-✔ Selector de producto
-✔ Cálculo dinámico de métricas:
-    - Precio
-    - Demanda
-    - Variabilidad
-    - Frecuencia
+GRÁFICOS IMPLEMENTADOS:
 
-✔ Score estratégico
-✔ Clasificación visual
-✔ Recomendación automática
-✔ Radar chart
+1. 📊 Bar Chart
+   → Precio promedio por producto
+
+2. 🥧 Pie Chart
+   → Distribución por rango
+
+3. 📍 Gráfico geográfico
+   → Precio por región
+
+4. 📈 Línea temporal
+   → Tendencia de precios
+
+5. 📦 Boxplot
+   → Dispersión por marca
+
+6. 🕸️ Radar Chart
+   → Perfil estratégico
+
+7. 📊 Scatter Plot
+   → Relación precio vs demanda
+
+TECNOLOGÍAS:
+✔ Plotly Express
+✔ Plotly Graph Objects
+
+============================================================================
+🧠 CAPA 7 — LÓGICA DE NEGOCIO
+----------------------------------------------------------------------------
+
+Archivo:
+→ business_logic.py
+
+FUNCIONES:
+
+✔ normalizar()
+✔ calcular_score()
+✔ clasificar()
+✔ recomendacion()
+
+============================================================================
+MODELO DE SCORE
+----------------------------------------------------------------------------
+
+Variables consideradas:
+
+✔ Precio
+✔ Demanda
+✔ Estabilidad
+✔ Frecuencia
+✔ Ranking
+
+CLASIFICACIÓN:
+
+✔ ALTO
+✔ MEDIO
+✔ BAJO
 
 📌 NEGOCIO:
-Análisis profundo por producto
+Convierte datos en decisiones estratégicas.
 
-==========================================================================
+============================================================================
+🖥️ CAPA 8 — DASHBOARD STREAMLIT
+----------------------------------------------------------------------------
 
-⚙️ OPTIMIZACIONES IMPLEMENTADAS
--------------------------------
+Archivo:
+→ app.py
 
-✔ Cache de datos
-✔ Sampling inteligente (5000 filas)
-✔ Manejo de NaN
-✔ Prevención de división por cero
-✔ Conversión robusta de tipos
-✔ Reducción de saturación visual
+FUNCIONES PRINCIPALES:
 
-==========================================================================
+✔ Sidebar interactivo
+✔ KPIs dinámicos
+✔ Tabs analíticos
+✔ Explorador de productos
+✔ Correlación
+✔ Radar analítico
 
-🚀 ESCALABILIDAD (FUTURO)
-------------------------
+============================================================================
+SECCIONES DEL DASHBOARD
+----------------------------------------------------------------------------
 
-✔ Integración con base de datos (PostgreSQL / BigQuery)
-✔ API REST (FastAPI)
-✔ Machine Learning:
-    - Predicción de precios
-    - Clustering de productos
-✔ Sistema de alertas:
-    - precios anómalos
-✔ Deploy:
-    - Streamlit Cloud / Docker
+TABS:
 
-==========================================================================
+✔ Arquitectura
+✔ Resumen
+✔ Geográfico
+✔ Análisis
+✔ Correlación
+✔ Explorador
 
+============================================================================
+⚡ OPTIMIZACIONES IMPLEMENTADAS
+----------------------------------------------------------------------------
+
+✔ st.cache_data
+✔ Sampling inteligente
+✔ Manejo robusto de NaN
+✔ Prevención división por cero
+✔ Downcasting
+✔ Reducción saturación visual
+✔ Carga híbrida resiliente
+
+============================================================================
+🌐 COMPATIBILIDAD DE ENTORNOS
+----------------------------------------------------------------------------
+
+✔ LOCAL:
+    - Flask
+    - API REST
+    - Streamlit
+
+✔ WEB:
+    - GitHub
+    - Streamlit Cloud
+    - Lectura parquet
+
+============================================================================
+🚀 ESCALABILIDAD FUTURA
+----------------------------------------------------------------------------
+
+✔ PostgreSQL
+✔ BigQuery
+✔ Docker
+✔ FastAPI
+✔ Machine Learning
+✔ Alertas automáticas
+✔ Predicción de precios
+✔ Clustering
+✔ Mapas geográficos
+
+============================================================================
 🎯 CONCLUSIÓN
--------------
+----------------------------------------------------------------------------
 
-Arquitectura:
+La arquitectura implementada permite:
 
-✔ Modular
-✔ Escalable
-✔ Orientada a negocio
-✔ Lista para producción ligera
+✔ Separación modular real
+✔ Reutilización de componentes
+✔ Integración ETL + BI
+✔ Compatibilidad local y cloud
+✔ Análisis estratégico automatizado
 
-Este dashboard ya no es solo visualización:
-→ Es un sistema de soporte a decisiones.
+El proyecto evoluciona de un dashboard tradicional a:
+
+→ Una plataforma analítica orientada a soporte de decisiones.
 """

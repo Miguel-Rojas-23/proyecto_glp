@@ -55,17 +55,35 @@ def grafico_radar(valores, producto):
             "Precio"
         ],
         fill='toself',
-        name=producto
+        name=producto,
+        line=dict(width=4)
     ))
 
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[0, 1]
+                range=[0, 1],
+
+                # 🔥 NÚMEROS MÁS GRANDES
+                tickfont=dict(size=16),
+
+                # 🔥 GRID MÁS VISIBLE
+                gridwidth=2
+            ),
+
+            angularaxis=dict(
+                tickfont=dict(size=15)
             )
         ),
-        height=500
+
+        # 🔥 MÁS ESPACIO
+        height=700,
+
+        # 🔥 LETRAS MÁS GRANDES
+        font=dict(size=15),
+
+        showlegend=False
     )
 
     return fig

@@ -192,20 +192,35 @@ with tab3:
     st.markdown("### 📍 Relación Precio vs Demanda")
 
     fig_scatter = px.scatter(
-        df_plot,
-        x="indice_demanda",
-        y="precio_de_venta_(soles)",
-        color="grupo_producto",
-        opacity=0.6,
-        size_max=12,  # 🔥 puntos más grandes
-        hover_data={
-            "grupo_producto": False,
-            "producto": True,
-            "marca": True,
-            "distrito": True,
-            "precio_de_venta_(soles)": ":.2f",
-            "indice_demanda": ":.2f"
+    df_plot,
+    x="indice_demanda",
+    y="precio_de_venta_(soles)",
+    color="grupo_producto",
+    opacity=0.75,
+    hover_data={
+        "grupo_producto": False,
+        "producto": True,
+        "marca": True,
+        "distrito": True,
+        "precio_de_venta_(soles)": ":.2f",
+        "indice_demanda": ":.2f"
         }
+    )
+
+    # 🔥 MEJORAS VISUALES
+    fig_scatter.update_traces(
+        marker=dict(
+            size=11,          # tamaño círculos
+            line=dict(width=1)
+        )
+    )
+
+    fig_scatter.update_layout(
+        height=650,
+        font=dict(size=14),
+        legend_title="Producto",
+        xaxis_title="Índice de Demanda",
+        yaxis_title="Precio de Venta (S/.)"
     )
 
     st.plotly_chart(fig_scatter, use_container_width=True)
@@ -241,10 +256,27 @@ with tab3:
     st.markdown("### 📦 Distribución de Precios por Marca")
 
     fig_box = px.box(
-        df_f,
-        x="marca",
-        y="precio_de_venta_(soles)",
-        color="marca"
+    df_f,
+    x="marca",
+    y="precio_de_venta_(soles)",
+    color="marca",
+    points="outliers"
+    )
+
+    # 🔥 aumentar tamaño de puntos
+    fig_box.update_traces(
+        marker=dict(
+            size=9,
+            opacity=0.7,
+            line=dict(width=1)
+        )
+    )
+
+    fig_box.update_layout(
+        height=650,
+        font=dict(size=14),
+        xaxis_title="Marca",
+        yaxis_title="Precio de Venta (S/.)"
     )
 
     st.plotly_chart(fig_box, use_container_width=True)
