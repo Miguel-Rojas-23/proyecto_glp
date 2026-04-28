@@ -3,56 +3,44 @@ import streamlit as st
 from pathlib import Path
 import numpy as np
 
-# ── RUTA DEL DATASET ─────────────────────────────
-# Obtiene la raíz del proyecto automáticamente
+# ── BASE DEL PROYECTO ──────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Ruta al parquet dentro de /data
+# ── RUTA DEL PARQUET ───────────────────────────
 DATA_PATH = BASE_DIR / "data" / "dataset_final_glp.parquet"
 
 @st.cache_data(show_spinner=False)
 def cargar_datos():
-    """
-    Carga el dataset desde parquet.
 
-    📌 NEGOCIO:
-    Se usa parquet porque permite:
-    - Mejor rendimiento
-    - Menor tamaño
-    - Compatible con pipelines ETL
-
-    📌 TÉCNICO:
-    - Si no existe el archivo → devuelve DataFrame vacío
-    - Se implementa CACHE para mejorar rendimiento
-
-    🆕 MEJORA:
-    - Se agrega feature engineering básico
-    """
+    st.write("📂 Ruta buscada:")
+    st.write(DATA_PATH)
 
     try:
 
-        if DATA_PATH.exists():
+        # ── VALIDACIÓN EXISTENCIA ───────────────
+        if not DATA_PATH.exists():
 
-            # ── LECTURA PARQUET ─────────────────────
-            df = pd.read_parquet(DATA_PATH)
+            st.error(f"❌ No existe el archivo:\n{DATA_PATH}")
 
-            # ── FEATURE ENGINEERING ─────────────────
-            # 🆕 Transformación para análisis más robusto
+            return pd.DataFrame()
+
+        # ── LECTURA ────────────────────────────
+        df = pd.read_parquet(DATA_PATH)
+
+        st.success(f"✅ Dataset cargado: {len(df)} registros")
+
+        # ── FEATURE ENGINEERING ────────────────
+        if "precio_de_venta_(soles)" in df.columns:
+
             df["precio_log"] = np.log(
                 df["precio_de_venta_(soles)"]
                 .replace(0, np.nan)
             ).fillna(0)
 
-            print(f"✅ Dataset cargado correctamente: {len(df)} registros")
-
-            return df
-
-        else:
-            print(f"❌ Archivo no encontrado: {DATA_PATH}")
-            return pd.DataFrame()
+        return df
 
     except Exception as e:
 
-        print(f"❌ Error cargando parquet: {e}")
+        st.error(f"❌ Error leyendo parquet: {e}")
 
         return pd.DataFrame()
