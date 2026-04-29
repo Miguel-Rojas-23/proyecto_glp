@@ -59,38 +59,34 @@ for col in columnas_numericas:
 df = df.dropna(subset=["precio_de_venta_(soles)", "indice_demanda"])
 
 
+# ── LIMPIEZA STREAMLIT SAFE ───────
+df = df.dropna(subset=["id_region", "producto", "rango_precio"])
+
+
 # ── SIDEBAR ──────────────────────
 with st.sidebar:
     st.title("🎛️ Filtros")
 
-    region = st.multiselect(
-        "Región",
-        df["id_region"].unique(),
-        default=df["id_region"].unique()
-    )
+    regiones = sorted(df["id_region"].dropna().unique().tolist())
+    productos_top = df["producto"].value_counts().head(10).index.tolist()
+    rangos = sorted(df["rango_precio"].dropna().unique().tolist())
 
-    top_productos = df["producto"].value_counts().head(10).index
+    region = st.multiselect("Región", regiones, default=regiones)
+    producto = st.multiselect("Producto (Top 10)", productos_top, default=productos_top)
+    rango = st.multiselect("Rango", rangos, default=rangos)
 
-    producto = st.multiselect(
-        "Producto (Top 10)",
-        top_productos,
-        default=top_productos
-    )
+    precio_min = float(df["precio_de_venta_(soles)"].min())
+    precio_max = float(df["precio_de_venta_(soles)"].max())
 
-    rango = st.multiselect(
-        "Rango",
-        df["rango_precio"].unique(),
-        default=df["rango_precio"].unique()
-    )
-
-    precio_min = df["precio_de_venta_(soles)"].min()
-    precio_max = df["precio_de_venta_(soles)"].max()
+    if pd.isna(precio_min) or pd.isna(precio_max):
+        st.error("Datos de precio inválidos")
+        st.stop()
 
     precio_range = st.slider(
         "Precio",
-        float(precio_min),
-        float(precio_max),
-        (float(precio_min), float(precio_max))
+        min_value=precio_min,
+        max_value=precio_max,
+        value=(precio_min, precio_max)
     )
 
 
@@ -101,8 +97,7 @@ if df_f.empty:
     st.warning("⚠️ No hay datos con los filtros seleccionados")
     st.stop()
 
-if len(df_f) < len(df):
-    st.info(f"🔍 Mostrando {len(df_f)} de {len(df)} registros")
+st.info(f"🔍 Mostrando {len(df_f)} de {len(df)} registros")
 
 
 # ── HEADER ──────────────────────
@@ -110,17 +105,19 @@ st.title("⛽ Dashboard GLP Perú")
 st.divider()
 
 
-# ── KPI SAFE FUNCTION
-def safe(val):
-    return 0 if pd.isna(val) else val
+# ── SAFE FUNC ───────────────────
+def safe(x):
+    return 0 if pd.isna(x) else x
 
 
+# ── KPI ─────────────────────────
 kpis = calcular_kpis(df_f)
 kpis_full = calcular_kpis(df)
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Registros", safe(kpis["registros"]),
+col1.metric("Registros",
+            safe(kpis["registros"]),
             delta=safe(kpis["registros"] - kpis_full["registros"]))
 
 col2.metric("Promedio",
@@ -129,7 +126,6 @@ col2.metric("Promedio",
 
 col3.metric("Máximo", round(safe(kpis["precio_max"]), 2))
 col4.metric("Mínimo", round(safe(kpis["precio_min"]), 2))
-
 
 st.divider()
 
@@ -147,13 +143,12 @@ tab0, tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 # ── TAB 0 ───────────────────────
 with tab0:
-    st.text(arquitectura)
+    st.markdown(arquitectura)
 
 
 # ── TAB 1 ───────────────────────
 with tab1:
     fig_producto = grafico_precio_producto(df_f)
-    fig_producto.update_layout(title="💰 Precio Promedio por Producto")
     st.plotly_chart(fig_producto, use_container_width=True)
 
     dist = df_f["rango_precio"].value_counts().reset_index()
@@ -163,8 +158,7 @@ with tab1:
         dist,
         names="rango",
         values="cantidad",
-        hole=0.4,
-        title="📊 Distribución por Rango de Precio"
+        hole=0.4
     )
 
     st.plotly_chart(fig_pie, use_container_width=True)
@@ -178,8 +172,7 @@ with tab2:
         geo,
         x="id_region",
         y="precio_de_venta_(soles)",
-        text_auto=".2f",
-        title="🗺️ Precio Promedio por Región"
+        text_auto=".2f"
     )
 
     st.plotly_chart(fig_geo, use_container_width=True)
@@ -187,117 +180,35 @@ with tab2:
 
 # ── TAB 3 ───────────────────────
 with tab3:
-    st.subheader("📊 Análisis de Mercado")
+    df_plot = df_f.sample(min(5000, len(df_f)), random_state=42)
 
-    df_plot = (
-        df_f.sample(5000, random_state=42)
-        if len(df_f) > 5000
-        else df_f.copy()
-    )
-
-    top_productos_scatter = df_plot["producto"].value_counts().head(5).index
-
-    df_plot["grupo_producto"] = df_plot["producto"].apply(
-        lambda x: x if x in top_productos_scatter else "Otros"
-    )
-
-    st.markdown("### 📍 Relación Precio vs Demanda")
+    top = df_plot["producto"].value_counts().head(5).index
+    df_plot["grupo"] = df_plot["producto"].apply(lambda x: x if x in top else "Otros")
 
     fig_scatter = px.scatter(
         df_plot,
         x="indice_demanda",
         y="precio_de_venta_(soles)",
-        color="grupo_producto",
-        opacity=0.75,
-        hover_data={
-            "producto": True,
-            "marca": True,
-            "distrito": True,
-            "precio_de_venta_(soles)": ":.2f",
-            "indice_demanda": ":.2f"
-        }
-    )
-
-    fig_scatter.update_traces(
-        marker=dict(size=11, line=dict(width=1))
-    )
-
-    fig_scatter.update_layout(
-        height=650,
-        legend_title="Producto",
-        xaxis_title="Índice de Demanda",
-        yaxis_title="Precio de Venta (S/.)"
+        color="grupo"
     )
 
     st.plotly_chart(fig_scatter, use_container_width=True)
-
-
-    # ── TENDENCIA ──
-    producto_trend = st.selectbox(
-        "Producto tendencia",
-        df_f["producto"].dropna().unique()
-    )
-
-    trend = df_f[df_f["producto"] == producto_trend]
-
-    if not trend.empty:
-
-        trend = trend.groupby(["año", "mes"])["precio_de_venta_(soles)"].mean().reset_index()
-        trend = trend.dropna()
-
-        trend["periodo"] = pd.to_datetime(
-            trend["año"].astype(int).astype(str) + "-" +
-            trend["mes"].astype(int).astype(str) + "-01"
-        )
-
-        trend = trend.sort_values("periodo")
-
-        fig_line = px.line(
-            trend,
-            x="periodo",
-            y="precio_de_venta_(soles)",
-            markers=True
-        )
-
-        st.plotly_chart(fig_line, use_container_width=True)
-
-
-    # ── BOXPLOT ──
-    fig_box = px.box(
-        df_f,
-        x="marca",
-        y="precio_de_venta_(soles)",
-        color="marca",
-        points="outliers"
-    )
-
-    st.plotly_chart(fig_box, use_container_width=True)
 
 
 # ── TAB 4 ───────────────────────
 with tab4:
     corr = df_f[["precio_de_venta_(soles)", "indice_demanda"]].corr()
 
-    fig_corr = go.Figure(data=go.Heatmap(
-        z=corr.values,
-        x=corr.columns,
-        y=corr.columns,
-        text=corr.values,
-        texttemplate="%{text:.2f}",
-        zmin=-1,
-        zmax=1
-    ))
-
+    fig_corr = go.Figure(data=go.Heatmap(z=corr.values))
     st.plotly_chart(fig_corr, use_container_width=True)
 
 
 # ── TAB 5 ───────────────────────
 with tab5:
 
-    producto_sel = st.selectbox(
-        "Producto",
-        df_f["producto"].dropna().unique()
-    )
+    productos = df_f["producto"].dropna().unique().tolist()
+
+    producto_sel = st.selectbox("Producto", productos)
 
     df_p = df_f[df_f["producto"] == producto_sel]
 
@@ -305,36 +216,22 @@ with tab5:
 
         precio = df_p["precio_de_venta_(soles)"].mean()
         demanda = df_p["indice_demanda"].mean()
-        variabilidad = df_p["precio_de_venta_(soles)"].std()
-
-        if pd.isna(variabilidad):
-            variabilidad = 0
-
-        std_global = df_f["precio_de_venta_(soles)"].std()
-        if std_global == 0 or pd.isna(std_global):
-            std_global = 1
+        variabilidad = df_p["precio_de_venta_(soles)"].std() or 0
 
         valores = [
             normalizar(precio, df_f["precio_de_venta_(soles)"].min(), df_f["precio_de_venta_(soles)"].max()),
             normalizar(demanda, df_f["indice_demanda"].min(), df_f["indice_demanda"].max()),
-            normalizar(variabilidad, 0, std_global),
-            normalizar(len(df_p), 0, len(df_f)),
+            normalizar(variabilidad, 0, df_f["precio_de_venta_(soles)"].std() or 1),
+            0.5,
             0.5
         ]
 
         score = calcular_score(valores)
         estado, color = clasificar(score)
 
-        st.metric("Score", round(score, 2))
+        st.metric("Score", score)
         st.markdown(f"Estado: :{color}[{estado}]")
-        st.info(recomendacion(score, *valores[:3]))
+        st.info(recomendacion(score, valores[0], valores[1], valores[2]))
 
         fig_radar = grafico_radar(valores, producto_sel)
-
-        if fig_radar is not None:
-            fig_radar.update_layout(
-                title=f"🛡️ Perfil Analítico del Producto: {producto_sel}"
-            )
-            st.plotly_chart(fig_radar, use_container_width=True)
-        else:
-            st.warning("No se pudo generar el radar")
+        st.plotly_chart(fig_radar, use_container_width=True)

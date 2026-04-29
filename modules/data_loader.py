@@ -3,7 +3,6 @@ import streamlit as st
 from pathlib import Path
 import numpy as np
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / "data" / "dataset_final_glp.parquet"
 
@@ -11,37 +10,26 @@ DATA_PATH = BASE_DIR / "data" / "dataset_final_glp.parquet"
 @st.cache_data(show_spinner=False)
 def cargar_datos():
 
-    try:
-        st.write("📂 Ruta:", DATA_PATH)
-
-        if not DATA_PATH.exists():
-            st.error(f"❌ Archivo no encontrado:\n{DATA_PATH}")
-            st.write("📁 Archivos en data:", list((BASE_DIR / "data").glob("*")))
-            return pd.DataFrame()
-
-        df = pd.read_parquet(DATA_PATH)
-
-        # normalización de columnas
-        df.columns = [
-            c.strip().lower().replace(" ", "_")
-            for c in df.columns
-        ]
-
-        # asegurar tipo numérico
-        if "precio_de_venta_(soles)" in df.columns:
-            df["precio_de_venta_(soles)"] = pd.to_numeric(
-                df["precio_de_venta_(soles)"],
-                errors="coerce"
-            )
-
-            df["precio_log"] = np.log(
-                df["precio_de_venta_(soles)"].replace(0, np.nan)
-            ).fillna(0)
-
-        st.success(f"✅ Dataset cargado: {len(df):,} registros")
-
-        return df
-
-    except Exception as e:
-        st.error(f"❌ Error cargando parquet:\n{e}")
+    if not DATA_PATH.exists():
         return pd.DataFrame()
+
+    df = pd.read_parquet(DATA_PATH)
+
+    # normalización columnas
+    df.columns = (
+        df.columns
+        .str.strip()
+        .str.lower()
+        .str.replace(" ", "_")
+    )
+
+    # conversión segura
+    if "precio_de_venta_(soles)" in df.columns:
+        df["precio_de_venta_(soles)"] = pd.to_numeric(
+            df["precio_de_venta_(soles)"],
+            errors="coerce"
+        )
+
+        df["precio_log"] = np.log1p(df["precio_de_venta_(soles)"])
+
+    return df
