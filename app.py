@@ -149,7 +149,7 @@ with tab0:
 # ── TAB 1 ───────────────────────
 with tab1:
     fig_producto = grafico_precio_producto(df_f)
-    st.plotly_chart(fig_producto, use_container_width=True)
+    st.plotly_chart(fig_producto, width="stretch")
 
     dist = df_f["rango_precio"].value_counts().reset_index()
     dist.columns = ["rango", "cantidad"]
@@ -161,7 +161,7 @@ with tab1:
         hole=0.4
     )
 
-    st.plotly_chart(fig_pie, use_container_width=True)
+    st.plotly_chart(fig_pie, width="stretch")
 
 
 # ── TAB 2 ───────────────────────
@@ -175,7 +175,7 @@ with tab2:
         text_auto=".2f"
     )
 
-    st.plotly_chart(fig_geo, use_container_width=True)
+    st.plotly_chart(fig_geo, width="stretch")
 
 
 # ── TAB 3 ───────────────────────
@@ -192,7 +192,7 @@ with tab3:
         color="grupo"
     )
 
-    st.plotly_chart(fig_scatter, use_container_width=True)
+    st.plotly_chart(fig_scatter, width="stretch")
 
 
 # ── TAB 4 ───────────────────────
@@ -200,7 +200,7 @@ with tab4:
     corr = df_f[["precio_de_venta_(soles)", "indice_demanda"]].corr()
 
     fig_corr = go.Figure(data=go.Heatmap(z=corr.values))
-    st.plotly_chart(fig_corr, use_container_width=True)
+    st.plotly_chart(fig_corr, width="stretch")
 
 
 # ── TAB 5 ───────────────────────
@@ -234,4 +234,4 @@ with tab5:
         st.info(recomendacion(score, valores[0], valores[1], valores[2]))
 
         fig_radar = grafico_radar(valores, producto_sel)
-        st.plotly_chart(fig_radar, use_container_width=True)
+        st.plotly_chart(fig_radar, width="stretch")
