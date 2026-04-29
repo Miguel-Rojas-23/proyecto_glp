@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import time
+
 
 from modules.data_loader import cargar_datos
 from modules.filters import aplicar_filtros
